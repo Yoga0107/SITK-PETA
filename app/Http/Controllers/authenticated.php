@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use GrahamCampbell\ResultType\Success;
-use Illuminate\Support\Facades\Log;
-use Hamcrest\Core\HasToString;
+use App\Http\Controllers\authenticated as ControllersAuthenticated;
+use App\Models\Users;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use PhpParser\JsonDecoder;
 
 class authenticated extends Controller
 {
@@ -18,30 +14,41 @@ class authenticated extends Controller
             'username' => 'required',
             'password' => 'required|min:6'
         ]);
-        $privileges = DB::table('users')->select('username','password','privileges')->where('password', $auth_req['password'])->where('username', $auth_req['username'])->get();
-
-        /* $Level_Condition = array(;
-        /* $Level_Condition = array()
-            0 => "False",
-            1 => "True"
-        ); */
-
-        # Log::info('check query privileges working', $privileges.toSQL());
-        // session_start(); 
-        // Problem 1. Didn't Convert to String
-        foreach($privileges as $data)
-        {
-            return back()->with('success', $data['privileges']);
-            /*
-            if ($data['privileges'] == 'Admin')
+        # Hash
+        # Model Are Table
+       $privileges = Users::select('username', 'password', 'privileges')->where('username', '=', $auth_req['username'])->where('password', $auth_req['password'])->get();
+       foreach(json_decode($privileges, true) as $iterate => $data)
+       {
+            $Elevated = strval($data['username']);
+            $Hash = $data['password'];
+            $first = $auth_req->session()->put($auth_req['username'], @csrf_token());
+            if($Elevated == $auth_req['username'] && $auth_req['password'] == $Hash)
             {
-                return json_decode($privileges);
+                $pass_sessions = new ControllersAuthenticated;
+                $pass_sessions->prev_sessions($first);
+                return redirect('/Dashboard');
+                # Session will be applied
             }
             else
             {
-                return back()->with('failed', "A");
+                return back()->with('failed', 'Either Your password incorrect or Username');       
             }
-            */
+        }
+    }
+
+    function sessions($sessions)
+    {
+        $call_sessions = new ControllersAuthenticated;
+        dd($call_sessions->prev_sessions($sessions));
+    }
+
+    function prev_sessions($sessions)
+    {
+        $data = array();
+        if($data == null)
+        {
+            $data = array($sessions);
+            return $data;
         }
     }
 }
