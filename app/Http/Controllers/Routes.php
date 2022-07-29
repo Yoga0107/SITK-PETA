@@ -23,10 +23,8 @@ class Routes extends Controller
 
     public function dashboard(Request $req)
     {
-        $new = new authenticated;
         $session_set = $req->session()->all();
-        $data = $new->prev_sessions($session_set);
-        if(isset($data))
+        if($session_set)
         {
             return view('dashboard.index');
         }

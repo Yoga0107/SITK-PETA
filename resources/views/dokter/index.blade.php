@@ -1,5 +1,4 @@
 @include('layouts.sidebar')
-@include('layouts.topbar')
 <section id="column-selectors">
     <div class="row">
       <div class="col-12">

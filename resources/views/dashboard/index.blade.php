@@ -1,5 +1,4 @@
 @include('layouts.sidebar')
-@include('layouts.topbar')
 @include('dashboard.dashboard')
 <!-- Dashboard Analytics Start -->
 <!-- Dashboard Analytics end -->

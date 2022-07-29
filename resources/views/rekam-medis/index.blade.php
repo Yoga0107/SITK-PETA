@@ -1,4 +1,3 @@
-@include('layouts.topbar')
 @include('layouts.sidebar')
 <section id="column-selectors">
   <div class="row">

@@ -1,5 +1,3 @@
-
-@include('layouts.topbar')
 @include('layouts.sidebar')
 <!-- User Table -->
 <section id="column-selectors">
