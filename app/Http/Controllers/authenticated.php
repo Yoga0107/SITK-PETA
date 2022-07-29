@@ -4,7 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\authenticated as ControllersAuthenticated;
 use App\Models\Users;
+use Hamcrest\Core\Set;
+use Illuminate\Console\View\Components\Alert;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Redis;
+use RealRashid\SweetAlert\SweetAlertServiceProvider;
 
 class authenticated extends Controller
 {
@@ -16,39 +22,42 @@ class authenticated extends Controller
         ]);
         # Hash
         # Model Are Table
-       $privileges = Users::select('username', 'password', 'privileges')->where('username', '=', $auth_req['username'])->where('password', $auth_req['password'])->get();
-       foreach(json_decode($privileges, true) as $iterate => $data)
-       {
-            $Elevated = strval($data['username']);
-            $Hash = $data['password'];
-            $first = $auth_req->session()->put($auth_req['username'], @csrf_token());
-            if($Elevated == $auth_req['username'] && $auth_req['password'] == $Hash)
-            {
-                $pass_sessions = new ControllersAuthenticated;
-                $pass_sessions->prev_sessions($first);
-                return redirect('/Dashboard');
-                # Session will be applied
-            }
-            else
-            {
-                return back()->with('failed', 'Either Your password incorrect or Username');       
-            }
-        }
-    }
-
-    function sessions($sessions)
-    {
-        $call_sessions = new ControllersAuthenticated;
-        dd($call_sessions->prev_sessions($sessions));
-    }
-
-    function prev_sessions($sessions)
-    {
-        $data = array();
-        if($data == null)
+        # $auth_req->requet_sessions($auth_req);
+        $privileges = Users::select('username', 'password', 'privileges')->where('username', '=', $auth_req['username'])->where('password', $auth_req['password'])->get();
+        if($privileges)
         {
-            $data = array($sessions);
-            return $data;
+
+            foreach(json_decode($privileges, true) as $iterate => $data)
+            {
+                $Elevated = strval($data['username']);
+                $Hash = $data['password'];
+                if($Elevated == $auth_req['username'] && $auth_req['password'] == $Hash)
+                {
+                    $pass_sessions = new ControllersAuthenticated;
+                    $pass_sessions->prev_sessions($auth_req, $auth_req->session()->put($auth_req['password'], Hash::make($auth_req['password'])));
+                    return redirect('/Dashboard');
+                # Session will be applied
+                }# Session will be applied
+            }
+       }
+       
+        Toast('Either Your password Incorrect or Username', 'error');
+        return back();
+    }
+
+    function prev_sessions(Request $Reqs, $sessions)
+    {
+        if($Reqs->session()->has($sessions))
+        {
+            $Reqs['login'] = true;
+            $Reqs->flash();
+            return;
         }
+        abort(401, "Woah, Try to be Sneaky heh");
+    }
+
+    function requet_sessions(Request $req)
+    {
+        # $this->saved_sessions = $req->session()-StartSession
     }
 }

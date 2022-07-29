@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\dokter;
 use App\Models\dokters;
+use Illuminate\Support\Facades\DB;
 use App\Models\obats;
 use App\Models\pasiens;
 use App\Models\report_medicals;
@@ -30,8 +31,10 @@ class CreateController extends Controller
         $data->keterangan = $add ->keterangan;
         $data->tanggal_buat = $add ->tanggal_buat;
         $data->expired = $add->expired;
-        $check = $data->save();
-        
+        # $check = $data->save();
+        $sql = DB::table('obats')->update(['nama_obat'=>$add['nama_obat']]);
+        # update `obats` set `nama_obat` = 'Obat 5'
+
         if($check)
         {
             return redirect('/Obat')->with('success', 'Data Successful Input');

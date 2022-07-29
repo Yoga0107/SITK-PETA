@@ -1,10 +1,6 @@
 @include('layouts.header')
-
+@extends('sweetalert::alert') 
 <body class="vertical-layout vertical-menu-modern semi-dark-layout 1-column  navbar-floating footer-static bg-full-screen-image  blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column" data-layout="semi-dark-layout">
-    <!-- BEGIN: Content-->
-    @if(Session::get('success'))
-        <h1>{{Session::get('success')}}</h1>
-    @endif
     @if(Session::get('failed'))
         <h1>{{Session::get('failed')}}</h1>
     @endif
